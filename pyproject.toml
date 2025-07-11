@@ -5,7 +5,7 @@ description = "Testing Accelerators for fptmark"
 authors = [
     {name = "Nick Baynham", email = "nickbaynham@gmail.com"},
 ]
-dependencies = []
+dependencies = ["requests>=2.32.4", "beautifulsoup4>=4.13.4", "pytest-playwright>=0.7.0"]
 requires-python = ">=3.13"
 readme = "README.md"
 license = {text = "NONE"}
@@ -17,3 +17,10 @@ build-backend = "pdm.backend"
 
 [tool.pdm]
 distribution = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
