@@ -35,7 +35,7 @@ pdm run python -m playwright install
 ```
 
 # Run all tests
-pdm run pytest
+pdm run pytest -s
 
 # Run just the entity navigation tests
 pdm run pytest tests/ui/test_entity_navigation.py
