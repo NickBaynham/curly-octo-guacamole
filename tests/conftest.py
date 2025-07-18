@@ -4,12 +4,14 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
-env_file = Path.cwd() / ".env"
-if env_file.exists():
-    load_dotenv(env_file)
-    print(f"✅ Loaded .env file from: {env_file}")
-else:
-    print(f"⚠️  No .env file found at: {env_file}")
+load_dotenv()
+
+def get_base_url():
+    """Return the BASE_URL from the environment (.env file)."""
+    base_url = os.getenv("BASE_URL")
+    if not base_url:
+        raise RuntimeError("BASE_URL is not set in the environment or .env file.")
+    return base_url
 
 # Configure pytest-playwright settings from environment variables
 def pytest_configure(config):
