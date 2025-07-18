@@ -43,3 +43,7 @@ pdm run pytest tests/ui/test_entity_navigation.py
 # Run with verbose output
 pdm run pytest -v
 
+# Generate Playwright Code
+```
+pdm run playwright codegen localhost:4200
+```
