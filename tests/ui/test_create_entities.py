@@ -114,7 +114,7 @@ def test_create_entities(page: Page, base_url: str, log: logging.Logger):
         "location": "444 Event Drive, Anytown, CA 90102",
     }
 
-        # Navigate to Events
+    # Navigate to Events
     events_button = page.get_by_role("button", name="Manage Events")
     events_button.click()
     

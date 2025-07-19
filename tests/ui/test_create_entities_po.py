@@ -3,6 +3,8 @@ from playwright.sync_api import Page
 import pytest
 import sys
 from pathlib import Path
+
+from tests.conftest import get_base_url
 sys.path.append(str(Path(__file__).parent.parent.parent / "src"))
 import curly_octo_guacamole.ui.framework.utils as utils
 
@@ -14,9 +16,9 @@ from curly_octo_guacamole.ui.framework.page_objects.affinity_page import Affinit
 from curly_octo_guacamole.ui.framework.page_objects.user_event_page import UserEventPage
 from datetime import datetime
 
-def test_create_entities_po(page: Page, base_url: str, log: logging.Logger):
+def test_create_entities_po(page: Page, log: logging.Logger):
     """Test creating entities using the UI with Page Objects"""
-    page.goto(base_url)
+    page.goto(get_base_url())
     page.wait_for_load_state("networkidle")
     assert page.title() == "Events Management"
 
@@ -86,7 +88,7 @@ def test_create_entities_po(page: Page, base_url: str, log: logging.Logger):
         "user_id": "687133d20e46574d4becf424",
     }
     
-    user_event_page.create_user_event(**user_event_data)
+    user_event_page.create_user_event(user_event_data)
     log.info("Created user event: %s", user_event_data)
 
 @pytest.fixture(scope="session")
@@ -94,7 +96,3 @@ def log():
     logger = logging.getLogger("test_create_entities_po")
     logger.setLevel(logging.INFO)
     return logger
-
-@pytest.fixture(scope="session")
-def base_url() -> str:
-    return "http://localhost:3000"  # Replace with your actual base URL 

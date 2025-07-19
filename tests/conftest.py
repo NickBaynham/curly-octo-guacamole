@@ -22,12 +22,16 @@ def pytest_configure(config):
         config.option.playwright_headed = not headless
         print(f"🔧 Set playwright_headed to: {not headless}")
     
-    if os.getenv("SLOW_MO"):
-        slow_mo = int(os.getenv("SLOW_MO", "0"))
-        print(f"🔍 Raw SLOW_MO from .env: {os.getenv('SLOW_MO')}")
-        print(f"🔍 Parsed slow_mo value: {slow_mo}")
-        config.option.playwright_slow_mo = slow_mo
-        print(f"🔧 Set playwright_slow_mo to: {slow_mo}ms")
+    slow_mo_raw = os.getenv("SLOW_MO")
+    if slow_mo_raw is not None:
+        try:
+            slow_mo = int(slow_mo_raw)
+            print(f"🔍 Raw SLOW_MO from .env: {slow_mo_raw}")
+            print(f"🔍 Parsed slow_mo value: {slow_mo}")
+            config.option.playwright_slow_mo = slow_mo
+            print(f"🔧 Set playwright_slow_mo to: {slow_mo}ms")
+        except ValueError:
+            print(f"⚠️  Invalid SLOW_MO value '{slow_mo_raw}', ignoring")
     else:
         print("⚠️  No SLOW_MO found in environment variables")
 
@@ -41,13 +45,18 @@ def browser_type_launch_args(browser_type_launch_args):
     print(f"🔧 Set browser headless to: {headless}")
     
     # Configure slow_mo setting
-    slow_mo = int(os.getenv("SLOW_MO", "0"))
-    print(f"🔍 Fixture: Raw SLOW_MO from .env: {os.getenv('SLOW_MO')}")
-    print(f"🔍 Fixture: Parsed slow_mo value: {slow_mo}")
-    if slow_mo > 0:
-        browser_type_launch_args["slow_mo"] = slow_mo
-        print(f"🔧 Set browser launch slow_mo to: {slow_mo}ms")
-    else:
-        print("⚠️  Fixture: No SLOW_MO value or it's 0")
+    slow_mo_raw = os.getenv("SLOW_MO", "50")
+    print(f"🔍 Fixture: Raw SLOW_MO from .env: {slow_mo_raw}")
+    try:
+        slow_mo = int(slow_mo_raw) if slow_mo_raw else 50
+        print(f"🔍 Fixture: Parsed slow_mo value: {slow_mo}")
+        if slow_mo > 0:
+            browser_type_launch_args["slow_mo"] = slow_mo
+            print(f"🔧 Set browser launch slow_mo to: {slow_mo}ms")
+        else:
+            print("⚠️  Fixture: No SLOW_MO value or it's 0")
+    except ValueError:
+        print(f"⚠️  Fixture: Invalid SLOW_MO value '{slow_mo_raw}', using 50")
+        slow_mo = 50
     
     return browser_type_launch_args 
