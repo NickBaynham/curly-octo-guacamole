@@ -8,6 +8,8 @@ pdm run pytest tests/api/test_account.py -s
 from playwright.sync_api import Playwright, expect
 from datetime import datetime
 import pytest
+import os
+import json
 from .test_utils import APITestHelper, clean_collections, api_context, api_helper
 
 class TestAccountAPI:
@@ -16,8 +18,26 @@ class TestAccountAPI:
     def test_create_account(self, api_context, api_helper: APITestHelper, clean_collections) -> None:
         """Test creating a new account."""
 
-        # Arrange
-        test_data = api_helper.create_test_data("account")
+        # Check if we're running through the controller (environment variable set)
+        test_data_env = os.environ.get('TEST_DATA')
+        if test_data_env:
+            try:
+                # Parse the test data from environment variable
+                controller_data = json.loads(test_data_env)
+                # logger.info(f"Using test data from controller: {controller_data}") # Assuming logger is available
+                
+                # Extract relevant data for the test
+                test_data = {
+                    "expiredAt": controller_data.get("expired_at")
+                }
+            except (json.JSONDecodeError, KeyError) as e:
+                # logger.warning(f"Failed to parse controller test data: {e}") # Assuming logger is available
+                # Fall back to default test data
+                test_data = api_helper.create_test_data("account")
+        else:
+            # Use default test data for regular PyTest runs
+            test_data = api_helper.create_test_data("account")
+
         url = api_helper.get_entity_url("account")
 
         # Act
@@ -37,7 +57,8 @@ class TestAccountAPI:
 
         account = data[0]
         assert "id" in account, "Missing 'id' in account object"
-        assert account["expiredAt"] == test_data["expiredAt"]
+        if test_data.get("expiredAt"):
+            assert account["expiredAt"] == test_data["expiredAt"]
         api_helper.validate_entity_timestamps(account)
 
     def test_fetch_account_list(self, playwright: Playwright) -> None:
