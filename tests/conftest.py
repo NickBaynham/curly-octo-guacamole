@@ -2,6 +2,7 @@ import os
 import pytest
 from pathlib import Path
 from dotenv import load_dotenv
+from pymongo import MongoClient
 
 # Load environment variables from .env file
 load_dotenv()
@@ -60,3 +61,39 @@ def browser_type_launch_args(browser_type_launch_args):
         slow_mo = 50
     
     return browser_type_launch_args 
+
+@pytest.fixture(scope="session")
+def mongodb_cleaner():
+    """Pytest fixture for MongoDB cleanup."""
+    class MongoDBCleaner:
+        def __init__(self, connection_string: str = "mongodb://localhost:27017", db_name: str = "events_test"):
+            self.connection_string = connection_string
+            self.db_name = db_name
+            self.client = None
+            self.db = None
+        def connect(self):
+            self.client = MongoClient(self.connection_string)
+            self.db = self.client[self.db_name]
+        def disconnect(self):
+            if self.client:
+                self.client.close()
+        def clean_all_collections(self):
+            if self.db is None:
+                self.connect()
+            
+            collections = [
+                "accounts", "users", "profiles", "tagaffinities", 
+                "events", "userevents", "urls", "crawls"
+            ]
+            for collection_name in collections:
+                try:
+                    self.db[collection_name].delete_many({})
+                    print(f"Cleaned collection: {collection_name}")
+                except Exception as e:
+                    print(f"Warning: Could not clean collection {collection_name}: {e}")
+    cleaner = MongoDBCleaner()
+    cleaner.connect()
+    cleaner.clean_all_collections()
+    yield cleaner
+    cleaner.clean_all_collections()
+    cleaner.disconnect() 
