@@ -1,14 +1,31 @@
 from fastapi import FastAPI
 from fastapi_mcp import FastApiMCP
 import uvicorn
-import asyncio
 import logging
+from contextlib import asynccontextmanager
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifespan event handler for FastAPI."""
+    # Startup
+    logger.info("Starting MCP server...")
+    try:
+        # Setup the MCP server
+        mcp_app.setup_server()
+        logger.info("MCP server started successfully")
+    except Exception as e:
+        logger.error(f"Failed to start MCP server: {e}")
+    
+    yield
+    
+    # Shutdown
+    logger.info("Shutting down MCP server...")
+
+app = FastAPI(lifespan=lifespan)
 
 # Initialize MCP app
 mcp_app = FastApiMCP(app)
@@ -33,20 +50,6 @@ async def mcp_status():
             "resources": {}
         }
     }
-
-# Start the MCP server
-async def start_mcp_server():
-    """Start the MCP server in the background."""
-    try:
-        await mcp_app.start()
-        logger.info("MCP server started successfully")
-    except Exception as e:
-        logger.error(f"Failed to start MCP server: {e}")
-
-@app.on_event("startup")
-async def startup_event():
-    """Start the MCP server when the FastAPI app starts."""
-    asyncio.create_task(start_mcp_server())
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8001)
