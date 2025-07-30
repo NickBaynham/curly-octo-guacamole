@@ -29,14 +29,22 @@ class Controller:
     def run_api_test(self, data: dict) -> dict:
         """
         Execute API tests using PyTest while maintaining compatibility.
-        This method runs the test_account.py file with the provided data.
+        This method runs the appropriate test file based on the test type.
         """
         logger.info("Executing API Test")
         
         try:
             # Get the project root directory (go up from src/curly_octo_guacamole/api/controllers/)
             project_root = Path(__file__).parent.parent.parent.parent.parent
-            test_file_path = project_root / "tests" / "api" / "test_account.py"
+            
+            # Determine which test file to run based on the test type
+            test_type = data.get("test_type", "account")
+            if test_type == "user":
+                test_file_path = project_root / "tests" / "api" / "test_user.py"
+                test_method = "test_create_user"
+            else:  # default to account
+                test_file_path = project_root / "tests" / "api" / "test_account.py"
+                test_method = "test_create_account"
             
             if not test_file_path.exists():
                 raise FileNotFoundError(f"Test file not found: {test_file_path}")
@@ -46,11 +54,10 @@ class Controller:
             env['TEST_DATA'] = str(data)
             
             # Run the specific test using PyTest
-            # We'll run the test_create_account method specifically
             cmd = [
                 "pdm", "run", "pytest",
                 str(test_file_path),
-                "-k", "test_create_account",  # Run only the create account test
+                "-k", test_method,  # Run only the specific test method
                 "-v",  # Verbose output
                 "--tb=short",  # Short traceback
                 "--capture=no"  # Show print statements
@@ -58,6 +65,8 @@ class Controller:
             
             logger.info(f"Executing command: {' '.join(cmd)}")
             logger.info(f"Test data: {data}")
+            logger.info(f"Test file: {test_file_path}")
+            logger.info(f"Test method: {test_method}")
             
             # Run the test
             result = subprocess.run(

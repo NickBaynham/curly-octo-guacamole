@@ -4,6 +4,8 @@ Tests assume clean environment and restore to empty state after testing.
 """
 
 import pytest
+import os
+import json
 from datetime import datetime
 from playwright.sync_api import Playwright, expect
 from .test_utils import APITestHelper, clean_collections, api_context, api_helper
@@ -14,8 +16,33 @@ class TestUserAPI:
 
     def test_create_user(self, api_context, api_helper: APITestHelper, clean_collections) -> None:
         """Test creating a new user."""
-        # Arrange
-        test_data = api_helper.create_test_data("user")
+        
+        # Check if we're running through the controller (environment variable set)
+        test_data_env = os.environ.get('TEST_DATA')
+        if test_data_env:
+            try:
+                # Parse the test data from environment variable
+                controller_data = json.loads(test_data_env)
+                
+                # Extract relevant data for the test
+                test_data = {
+                    "username": controller_data.get("username", "testuser123"),
+                    "email": controller_data.get("email", "test@example.com"),
+                    "password": controller_data.get("password", "testpassword123"),
+                    "firstName": controller_data.get("first_name", "Test"),
+                    "lastName": controller_data.get("last_name", "User"),
+                    "gender": controller_data.get("gender", "other"),
+                    "isAccountOwner": controller_data.get("is_account_owner", True),
+                    "netWorth": controller_data.get("net_worth", 50000),
+                    "accountId": controller_data.get("account_id", "507f1f77bcf86cd799439011")
+                }
+            except (json.JSONDecodeError, KeyError) as e:
+                # Fall back to default test data
+                test_data = api_helper.create_test_data("user")
+        else:
+            # Use default test data for regular PyTest runs
+            test_data = api_helper.create_test_data("user")
+
         url = api_helper.get_entity_url("user")
 
         # Act

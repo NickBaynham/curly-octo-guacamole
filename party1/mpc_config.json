@@ -1,0 +1,32 @@
+{
+  "server_name": "party1",
+  "server_description": "Party 1 MCP Server for Multi-Party Computation",
+  "server_version": "1.0.0",
+  "capabilities": {
+    "tools": {
+      "compute": {
+        "description": "Perform MPC computations",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "operation": {
+              "type": "string",
+              "enum": ["add", "multiply", "compare"]
+            },
+            "values": {
+              "type": "array",
+              "items": {"type": "number"}
+            }
+          },
+          "required": ["operation", "values"]
+        }
+      }
+    },
+    "resources": {
+      "data": {
+        "description": "Access to party1's private data",
+        "mimeType": "application/json"
+      }
+    }
+  }
+} 

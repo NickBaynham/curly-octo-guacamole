@@ -27,6 +27,8 @@ def run_test(keyword: str, data: dict) -> dict:
     
     if keyword == "create_account":
         return run_create_account_test(data)
+    elif keyword == "create_user":
+        return run_create_user_test(data)
     
     return {"keyword": keyword, "received": data}
 
@@ -48,92 +50,40 @@ def run_create_account_test(data: dict) -> dict:
     else:
         test_type = "api"
 
+    # Add test_type to data for controller routing
+    data["test_type"] = "account"
+
     controller = Controller()
     result = controller.run_test(test_type, data)
     logger.info(f"Test Result: {result}")
 
-    # try:
-    #     with sync_playwright() as p:
-    #         logger.info("🚀 Launching headless browser...")
-    #         # Launch browser
-    #         browser = p.chromium.launch(headless=True)
-    #         context = browser.new_context()
-    #         page = context.new_page()
-            
-    #         logger.info("🌐 Navigating to UI application...")
-    #         # Navigate to the application
-    #         page.goto("http://localhost:4200")
-    #         page.wait_for_load_state("networkidle")
-            
-    #         logger.info("📋 Navigating to Accounts management page...")
-    #         # Navigate to Accounts page
-    #         accounts_button = page.get_by_role("button", name="Manage Accounts")
-    #         accounts_button.click()
-    #         page.wait_for_load_state("networkidle")
-            
-    #         logger.info("➕ Clicking Create Account button...")
-    #         # Click Create Account button
-    #         create_account_button = page.get_by_role("button", name="Create Account")
-    #         create_account_button.click()
-            
-    #         # Fill in the expiredAt field with the date from the request
-    #         expired_at = data.get("date", "2025-08-19")  # Default to today if not provided
-    #         logger.info(f"📅 Filling expiration date: {expired_at}")
-    #         page.fill('#expiredAt', expired_at)
-            
-    #         logger.info("📤 Submitting account creation form...")
-    #         # Submit the form
-    #         submit_button = page.get_by_role("button", name="Submit")
-    #         submit_button.click()
-            
-    #         # Wait for the form submission to complete
-    #         page.wait_for_load_state("networkidle")
-            
-    #         logger.info("🔍 Validating account creation result...")
-    #         # Check if account was created successfully
-    #         # Look for success message or redirect
-    #         success = True
-    #         error_message = None
-            
-    #         try:
-    #             # Check if we're back on the accounts page or if there's a success message
-    #             page.wait_for_url("**/entity/Account", timeout=5000)
-    #         except:
-    #             # If we're still on the create form, there might be an error
-    #             error_elements = page.locator(".error, .alert, [role='alert']")
-    #             if error_elements.count() > 0:
-    #                 success = False
-    #                 error_message = error_elements.first.text_content()
-            
-    #         # Close browser
-    #         context.close()
-    #         browser.close()
-            
-    #         logger.info("-" * 60)
-    #         if success:
-    #             logger.info("✅ ACCOUNT CREATION TEST PASSED")
-    #             logger.info(f"📅 Account created with expiration date: {expired_at}")
-    #         else:
-    #             logger.error("❌ ACCOUNT CREATION TEST FAILED")
-    #             if error_message:
-    #                 logger.error(f"💥 Error: {error_message}")
-    #         logger.info("=" * 60)
-            
-    return {
-        "success": "success",
-        "expired_at": data["expired_at"],
-        "error_message": None,
-        "message": "Account creation test completed"
-    }
-            
-    # except Exception as e:
-    #     logger.error("-" * 60)
-    #     logger.error("💥 ACCOUNT CREATION TEST EXCEPTION")
-    #     logger.error(f"🚨 Exception: {str(e)}")
-    #     logger.error("=" * 60)
-        
-    #     return {
-    #         "success": False,
-    #         "error": str(e),
-    #         "message": "Account creation test failed"
-    #     }
+    # Return the actual controller result instead of hardcoded response
+    return result
+
+def run_create_user_test(data: dict) -> dict:
+    """
+    Run the user creation test using Playwright.
+    """
+    logger.info("=" * 60)
+    logger.info("🧪 USER CREATION TEST STARTED")
+    logger.info("=" * 60)
+    logger.info(f"📋 Test Description: Creating user with data from the request")
+    logger.info(f"📅 Request Data: {data}")
+    logger.info(f"🎯 Target UI: http://localhost:4200")
+    logger.info(f"🔧 Test Type: Playwright UI Automation")
+    logger.info("-" * 60)
+
+    if data["ui_test"]:
+        test_type = "ui"
+    else:
+        test_type = "api"
+
+    # Add test_type to data for controller routing
+    data["test_type"] = "user"
+
+    controller = Controller()
+    result = controller.run_test(test_type, data)
+    logger.info(f"Test Result: {result}")
+
+    # Return the actual controller result instead of hardcoded response
+    return result

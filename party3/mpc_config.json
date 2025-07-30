@@ -1,0 +1,9 @@
+{
+    "parties": [
+      {"id": "P0", "url": "http://localhost:8080"},
+      {"id": "P1", "url": "http://localhost:8081"}
+    ],
+    "backend": "mpyc",
+    "port": 8080
+  }
+  
