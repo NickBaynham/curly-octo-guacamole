@@ -1,0 +1,86 @@
+{
+  "server_name": "party1",
+  "server_description": "Party 1 MCP Server for n8n Integration",
+  "server_version": "1.0.0",
+  "capabilities": {
+    "tools": {
+      "compute_mpc": {
+        "description": "Perform MPC computations with party1 data",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "operation": {
+              "type": "string",
+              "enum": ["add", "multiply", "compare", "sum", "average"],
+              "description": "The MPC operation to perform"
+            },
+            "values": {
+              "type": "array",
+              "items": {"type": "number"},
+              "description": "Array of values to process"
+            },
+            "threshold": {
+              "type": "number",
+              "description": "Threshold for comparison operations"
+            }
+          },
+          "required": ["operation", "values"]
+        }
+      },
+      "get_party_data": {
+        "description": "Retrieve party1's private data",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "data_type": {
+              "type": "string",
+              "enum": ["financial", "personal", "preferences"],
+              "description": "Type of data to retrieve"
+            },
+            "format": {
+              "type": "string",
+              "enum": ["json", "csv", "xml"],
+              "default": "json",
+              "description": "Output format"
+            }
+          },
+          "required": ["data_type"]
+        }
+      },
+      "validate_input": {
+        "description": "Validate input data for MPC operations",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "array",
+              "items": {"type": "number"},
+              "description": "Data to validate"
+            },
+            "constraints": {
+              "type": "object",
+              "properties": {
+                "min_value": {"type": "number"},
+                "max_value": {"type": "number"},
+                "required_length": {"type": "integer"}
+              }
+            }
+          },
+          "required": ["data"]
+        }
+      }
+    },
+    "resources": {
+      "party1_data": {
+        "description": "Access to party1's private data",
+        "mimeType": "application/json",
+        "uri": "party1://data"
+      },
+      "mpc_results": {
+        "description": "MPC computation results",
+        "mimeType": "application/json",
+        "uri": "party1://results"
+      }
+    }
+  }
+} 

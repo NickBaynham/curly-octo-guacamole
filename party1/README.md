@@ -8,6 +8,7 @@ This is a FastAPI-based MCP (Model Context Protocol) server for Party1 in a mult
 - ✅ **MCP Protocol Support**: Implements the Model Context Protocol for AI model integration
 - ✅ **Health Monitoring**: Built-in health check endpoints
 - ✅ **Status Reporting**: MCP server status and capabilities endpoint
+- ✅ **Configurable Port**: Environment variable support for port configuration
 
 ## API Endpoints
 
@@ -57,26 +58,76 @@ This is a FastAPI-based MCP (Model Context Protocol) server for Party1 in a mult
 pdm add fastapi-mcp
 ```
 
-2. Start the server:
+2. **Port Configuration**: The server uses port 8002 by default, but you can configure it via environment variable
+
+### Starting the Server
+
+#### Option 1: Default port (8002) - Recommended
 ```bash
+cd party1
 pdm run python main.py
 ```
+Server will run on `http://localhost:8002`
 
-The server will start on `http://localhost:8001`
+#### Option 2: Custom port via environment variable
+```bash
+cd party1
+PARTY1_PORT=8003 pdm run python main.py
+```
+Server will run on `http://localhost:8003`
+
+#### Option 3: From root directory
+```bash
+pdm run python party1/main.py
+```
+Server will run on `http://localhost:8002`
+
+#### Option 4: Check for port conflicts first
+```bash
+lsof -i :8001  # Check if port 8001 is in use
+lsof -i :8002  # Check if port 8002 is in use
+```
+
+### Environment Variables
+
+- `PARTY1_PORT`: Set the port number (default: 8002)
+  ```bash
+  export PARTY1_PORT=8003
+  pdm run python main.py
+  ```
 
 ### Testing
 
 Test the server endpoints:
 ```bash
 # Root endpoint
-curl http://localhost:8001/
+curl http://localhost:8002/
 
 # Health check
-curl http://localhost:8001/health
+curl http://localhost:8002/health
 
 # MCP status
-curl http://localhost:8001/mcp/status
+curl http://localhost:8002/mcp/status
 ```
+
+### Troubleshooting Port Conflicts
+
+If you get a port conflict error:
+
+1. **Check what's using the port:**
+   ```bash
+   lsof -i :8002
+   ```
+
+2. **Kill the process if needed:**
+   ```bash
+   kill <PID>
+   ```
+
+3. **Use a different port:**
+   ```bash
+   PARTY1_PORT=8003 pdm run python main.py
+   ```
 
 ## MCP Integration
 
@@ -113,5 +164,22 @@ FastAPI App
 ├── Status Endpoints
 └── Custom API Endpoints
 ```
+
+## Quick Start
+
+1. **Navigate to the party1 directory:**
+   ```bash
+   cd party1
+   ```
+
+2. **Start the server:**
+   ```bash
+   pdm run python main.py
+   ```
+
+3. **Test the server:**
+   ```bash
+   curl http://localhost:8002/
+   ```
 
 The server is ready for integration with MCP clients and can be extended with additional functionality as needed. 

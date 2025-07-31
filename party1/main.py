@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi_mcp import FastApiMCP
 import uvicorn
 import logging
+import os
 from contextlib import asynccontextmanager
 
 # Configure logging
@@ -52,4 +53,6 @@ async def mcp_status():
     }
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    # Get port from environment variable or use default
+    port = int(os.getenv("PARTY1_PORT", "8002"))
+    uvicorn.run(app, host="0.0.0.0", port=port)
